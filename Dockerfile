@@ -28,10 +28,6 @@ RUN chmod -R 775 storage bootstrap/cache \
 RUN composer install --no-dev --optimize-autoloader
 
 
-RUN php artisan key:generate
-
-RUN php artisan config:clear && php artisan cache:clear && php artisan config:cache
-
 # Exposer le port Laravel
 EXPOSE 8000
 
