@@ -20,14 +20,14 @@ RUN a2enmod rewrite
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copie les fichiers Laravel dans le container
-COPY . /var/www/html
+COPY . /var/www/html/public
 
 # Donne les bons droits
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage
+RUN chown -R www-data:www-data /var/www/html/public \
+    && chmod -R 755 /var/www/html/public/storage
 
 # Définit le dossier comme root web
-WORKDIR /var/www/html
+WORKDIR /var/www/html/public
 
 # Installe les dépendances Laravel
 RUN composer install --no-dev --optimize-autoloader
