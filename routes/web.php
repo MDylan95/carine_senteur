@@ -16,3 +16,5 @@ Route::get('/articles', function () {
 Route::get('/contact', function () {
     return view('FrontEnd.contact');
 })->name('contact');
+
+
