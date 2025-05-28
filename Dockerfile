@@ -1,7 +1,6 @@
-# Utilise l'image PHP avec Apache
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# Installe les extensions nécessaires
+# Installer les extensions nécessaires
 RUN apt-get update && apt-get install -y \
     libonig-dev \
     libzip-dev \
@@ -13,21 +12,23 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     && docker-php-ext-install pdo pdo_mysql zip mbstring gd xml
 
-# Active mod_rewrite
-RUN a2enmod rewrite
-
-# Installe Composer
+# Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copie les fichiers Laravel dans le container
-COPY . /var/www/html/public
+# Copier le projet Laravel
+COPY . /var/www/html
 
-# Donne les bons droits
-RUN chown -R www-data:www-data /var/www/html/public \
-    && chmod -R 755 /var/www/html/public/storage
+WORKDIR /var/www/html
 
-# Définit le dossier comme root web
-WORKDIR /var/www/html/public
+# Donner les bons droits
+RUN chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data .
 
-# Installe les dépendances Laravel
+# Installer les dépendances
 RUN composer install --no-dev --optimize-autoloader
+
+# Exposer le port Laravel
+EXPOSE 8000
+
+# Démarrer Laravel
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
