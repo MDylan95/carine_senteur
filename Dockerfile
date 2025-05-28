@@ -1,7 +1,6 @@
-# Utiliser PHP avec Apache
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# Installer les extensions PHP nécessaires
+# Installer les extensions nécessaires
 RUN apt-get update && apt-get install -y \
     libonig-dev \
     libzip-dev \
@@ -13,33 +12,30 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     && docker-php-ext-install pdo pdo_mysql zip mbstring gd xml
 
-# Activer mod_rewrite
-RUN a2enmod rewrite
-
-# Copier Composer depuis l’image officielle
+# Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copier les fichiers du projet Laravel
+# Copier le projet Laravel
 COPY . /var/www/html
 
-# Définir le dossier de travail
 WORKDIR /var/www/html
 
 # Donner les bons droits
 RUN chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data .
 
-# Installer les dépendances Laravel
+# Installer les dépendances
 RUN composer install --no-dev --optimize-autoloader
 
-# Générer la clé d'application
+
 RUN php artisan key:generate
 
-# Exposer le port 80
-EXPOSE 80
+RUN php artisan config:clear && php artisan cache:clear && php artisan config:cache
 
-# Configuration Apache pour rediriger toutes les requêtes vers public/index.php
-RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
+# Exposer le port Laravel
+EXPOSE 8000
 
-# Point d'entrée : Apache
-CMD ["apache2-foreground"]
+
+    # Démarrer Laravel
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+
