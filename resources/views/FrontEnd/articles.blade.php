@@ -44,7 +44,7 @@
                     <div class="card-body text-center p-2">
                         <h6 class="card-title fw-bold mb-1">Parfum Fruité</h6>
                         <p class="card-text text-muted small mb-1">Un mélange pétillant aux arômes de fruits rouges et d’agrumes.</p>
-                        <p class="text-primary fw-semibold mb-2" style="font-size: 0.95rem;">16 500 FCFA</p>
+                        <p class="text-primary fw-semibold mb-2" style="font-size: 0.95rem;">16 000 FCFA</p>
                         <a href="#" class="btn btn-sm btn-outline-primary rounded-pill">Commander</a>
                     </div>
                 </div>
