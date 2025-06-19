@@ -28,9 +28,6 @@ RUN git config --global --add safe.directory /var/www/html
 # Installer les dépendances PHP via Composer
 RUN composer install --optimize-autoloader --no-dev
 
-# Générer la clé d'application
-RUN php artisan key:generate
-
 # Permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 
