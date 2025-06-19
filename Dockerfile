@@ -1,8 +1,10 @@
 # Étape 1 : construire l'app
 FROM php:8.1-fpm-slim
 
-# Ensure all packages are updated after install
+# Installer dépendances système, PHP extensions, nginx, supervisor
 RUN apt-get update && apt-get install -y \
+    nginx \
+    supervisor \
     git \
     unzip \
     libonig-dev \
@@ -10,39 +12,32 @@ RUN apt-get update && apt-get install -y \
     zip \
     curl \
     && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath \
-    && apt-get upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# Installer les dépendances système nécessaires
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libonig-dev \
-    libzip-dev \
-    zip \
-    curl \
-    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath
 
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copier les fichiers
+# Copier les fichiers de l'app
 COPY . .
 
 # Installer les dépendances PHP via Composer
 RUN composer install --optimize-autoloader --no-dev
 
-# Générer la clé d'application (ou le faire avant)
+# Générer la clé d'application
 RUN php artisan key:generate
 
-# Permissions sur storage et bootstrap/cache
+# Permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Exposer le port 9000 pour php-fpm
-EXPOSE 9000
+# Copier la config nginx et supervisord
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Lancer php-fpm
-CMD ["php-fpm"]
+# Exposer le port 80 (Nginx)
+EXPOSE 80
+
+# Lancer supervisord qui gérera nginx + php-fpm
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
