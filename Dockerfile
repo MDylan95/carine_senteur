@@ -1,5 +1,5 @@
 # Étape 1 : construire l'app
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 # Installer dépendances système, PHP extensions, nginx, supervisor
 RUN apt-get update && apt-get install -y \
@@ -22,6 +22,8 @@ WORKDIR /var/www/html
 
 # Copier les fichiers de l'app
 COPY . .
+
+RUN git config --global --add safe.directory /var/www/html
 
 # Installer les dépendances PHP via Composer
 RUN composer install --optimize-autoloader --no-dev
