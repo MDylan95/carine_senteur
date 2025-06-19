@@ -1,5 +1,5 @@
 # Étape 1 : construire l'app
-FROM php:8.1-fpm-slim
+FROM php:8.1-fpm
 
 # Installer dépendances système, PHP extensions, nginx, supervisor
 RUN apt-get update && apt-get install -y \
